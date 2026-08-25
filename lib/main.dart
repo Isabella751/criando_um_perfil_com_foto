@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'dart:typed_data';
 
 void main() {
   runApp(const MainApp());
@@ -26,58 +26,76 @@ class PerfilPage extends StatefulWidget {
 }
 
 class _PerfilPageState extends State<PerfilPage> {
+
   final ImagePicker picker = ImagePicker();
 
-  File? fotoPerfil;
+  Uint8List? fotoPerfil;
 
   Future<void> escolherDaGaleria() async {
-    final XFile? imagem = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? imagem = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
 
     if (imagem == null) {
       return;
     }
+
+    final bytes = await imagem.readAsBytes();
+
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
-      fotoPerfil = File(imagem.path);
+      fotoPerfil = bytes;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Meu perfil')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 60,
-              backgroundImage: fotoPerfil != null
-                  ? FileImage(fotoPerfil!)
-                  : null,
-              child: const Icon(Icons.person, size: 70),
-            ),
+      appBar: AppBar(
+        title: const Text("Meu Perfil"),
+      ),
+    body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+      CircleAvatar(
+        radius: 60,
+        backgroundImage:
+        fotoPerfil != null ? MemoryImage(fotoPerfil!) : null,
+        child: fotoPerfil == null? const Icon(Icons.person, size: 70): null,
+      ),
 
-            const SizedBox(height: 20),
+      const SizedBox(height: 20,),
 
-            const Text(
-              'Vitor Lima',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 8),
-
-            const Text('vitor@gmail.com'),
-
-            const SizedBox(height: 10),
-
-            ElevatedButton.icon(
-              onPressed: escolherDaGaleria,
-              icon: const Icon(Icons.camera_alt),
-              label: const Text('Alterar foto'),
-            ),
-          ],
+      const Text(
+        'Isabella Leite',
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold
         ),
       ),
+
+      const SizedBox(height: 8,),
+
+      const Text(
+        'isaLt@gmail.com'
+      ),
+      
+      const SizedBox(height: 10,),
+
+      ElevatedButton.icon(
+        onPressed: escolherDaGaleria,
+        icon: const Icon(Icons.camera_alt),
+        label: const Text("Alterar Foto"),
+        )
+
+
+      ]
+    ),
+    )
     );
   }
 }
